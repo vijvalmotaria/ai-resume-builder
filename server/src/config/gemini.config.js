@@ -9,8 +9,12 @@ const generateContent = async (prompt) => {
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
       contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
     });
-    return response.text;
+    const text = typeof response.text === 'function' ? response.text() : response.text;
+    return text;
   } catch (error) {
     console.error('Gemini API error:', error.message);
     throw new Error('AI service temporarily unavailable. Please try again.');
