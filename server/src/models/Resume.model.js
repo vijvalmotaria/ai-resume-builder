@@ -1,0 +1,124 @@
+import mongoose from 'mongoose';
+
+const experienceSchema = new mongoose.Schema(
+  {
+    company: { type: String, default: '' },
+    role: { type: String, default: '' },
+    startDate: { type: String, default: '' },
+    endDate: { type: String, default: '' },
+    current: { type: Boolean, default: false },
+    description: { type: String, default: '' },
+    bullets: [{ type: String }],
+    location: { type: String, default: '' },
+  },
+  { _id: true }
+);
+
+const educationSchema = new mongoose.Schema(
+  {
+    institution: { type: String, default: '' },
+    degree: { type: String, default: '' },
+    field: { type: String, default: '' },
+    startDate: { type: String, default: '' },
+    endDate: { type: String, default: '' },
+    gpa: { type: String, default: '' },
+    achievements: [{ type: String }],
+  },
+  { _id: true }
+);
+
+const projectSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: '' },
+    description: { type: String, default: '' },
+    technologies: [{ type: String }],
+    link: { type: String, default: '' },
+    startDate: { type: String, default: '' },
+    endDate: { type: String, default: '' },
+  },
+  { _id: true }
+);
+
+const certificationSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: '' },
+    issuer: { type: String, default: '' },
+    date: { type: String, default: '' },
+    link: { type: String, default: '' },
+  },
+  { _id: true }
+);
+
+const atsBreakdownSchema = new mongoose.Schema(
+  {
+    keywordMatch: { type: Number, default: 0 },
+    bulletQuality: { type: Number, default: 0 },
+    formatting: { type: Number, default: 0 },
+    sectionCompleteness: { type: Number, default: 0 },
+    summaryStrength: { type: Number, default: 0 },
+    skillCoverage: { type: Number, default: 0 },
+    quantification: { type: Number, default: 0 },
+    actionVerbs: { type: Number, default: 0 },
+    length: { type: Number, default: 0 },
+    contactInfo: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
+const resumeSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    title: {
+      type: String,
+      default: 'Untitled Resume',
+      trim: true,
+    },
+    template: {
+      type: String,
+      enum: ['classic', 'modern', 'creative', 'minimal', 'executive'],
+      default: 'classic',
+    },
+    sections: {
+      personalInfo: {
+        fullName: { type: String, default: '' },
+        email: { type: String, default: '' },
+        phone: { type: String, default: '' },
+        location: { type: String, default: '' },
+        linkedin: { type: String, default: '' },
+        portfolio: { type: String, default: '' },
+        github: { type: String, default: '' },
+      },
+      summary: { type: String, default: '' },
+      experience: [experienceSchema],
+      education: [educationSchema],
+      skills: {
+        type: mongoose.Schema.Types.Mixed,
+        default: () => ({
+          programmingLanguages: [],
+          frameworks: [],
+          databases: [],
+          cloudDevOps: [],
+          tools: [],
+          soft: [],
+          languages: [],
+          technical: [],
+        }),
+      },
+      projects: [projectSchema],
+      certifications: [certificationSchema],
+    },
+    atsScore: { type: Number, default: 0 },
+    atsBreakdown: { type: atsBreakdownSchema, default: () => ({}) },
+    lastJobDescription: { type: String, default: '' },
+  },
+  { timestamps: true }
+);
+
+resumeSchema.index({ userId: 1, createdAt: -1 });
+
+const Resume = mongoose.model('Resume', resumeSchema);
+export default Resume;
